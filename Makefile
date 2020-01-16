@@ -17,7 +17,7 @@ clean:
 
 WGET = wget -c
 
-.PHONY: merge release
+.PHONY: merge release wiki
 
 MERGE  = Makefile README.md .gitignore
 
@@ -29,3 +29,8 @@ release:
 	git tag $(NOW)-$(REL)
 	git push -v && git push -v --tags
 	git checkout shadow
+
+wiki: wiki/Home.md
+
+wiki/Home.md:
+	git clone -o gh git@github.com:ponyatov/GameConsole.wiki.git wiki

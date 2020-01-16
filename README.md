@@ -3,6 +3,8 @@
 
 github: https://github.com/ponyatov/GameConsole
 
+manual: https://github.com/ponyatov/GameConsole/wiki
+
 #### MIT License
 
 Copyright (c) 2020 Dmitry Ponyatov <<dponyatov@gmail.com>>
