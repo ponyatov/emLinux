@@ -1,0 +1,7 @@
+*.iso
+*.u*
+*.bin
+*.zip
+*.tar.gz
+*.kernel
+*.initrd

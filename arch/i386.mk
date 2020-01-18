@@ -1,0 +1,1 @@
+ARCH_BR	= BR2_i386=y

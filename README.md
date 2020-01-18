@@ -1,9 +1,9 @@
-# GameConsole
-## emLinux GameConsole SDK
+# emLinux
+## embedded Linux & GameConsole SDK
 
-github: https://github.com/ponyatov/GameConsole
+github: https://github.com/ponyatov/emLinux/
 
-manual: https://github.com/ponyatov/GameConsole/wiki
+manual: https://github.com/ponyatov/emLinux/wiki
 
 #### MIT License
 
