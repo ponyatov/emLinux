@@ -33,7 +33,7 @@ GMP_VER      = 6.2.1
 MPFR_VER     = 4.2.1
 MPC_VER      = 1.3.1
 SYSLINUX_VER = 6.03
-LINUX_VER    = 6.5.5
+LINUX_VER    = 6.5.6
 UCLIBC_VER   = 1.0.44
 BUSYBOX_VER  = 1.36.1
 
@@ -132,12 +132,12 @@ linux: $(SRC)/$(LINUX)/README.md
 	mkdir -p $(TMP)/linux ; cd $(TMP)/linux ;\
 	rm $(KONFIG) ; $(KMAKE) allnoconfig &&\
 	cat $(CWD)/all/all.kernel $(CWD)/arch/$(ARCH).kernel \
-	    $(CWD)/cpu/$(CPU).kernel $(CWD)/hw/$(HW).kernel \
+		$(CWD)/cpu/$(CPU).kernel $(CWD)/hw/$(HW).kernel \
 		$(CWD)/app/$(APP).kernel            >> $(KONFIG) &&\
 	echo CONFIG_DEFAULT_HOSTNAME=\"$(APP)\" >> $(KONFIG) &&\
-	$(KMAKE) menuconfig &&\
-	$(KMAKE) -j$(CORES) && $(KMAKE) -j$(CORES) modules &&\
-	$(KMAKE) modules_install headers_install && $(MAKE) fw
+	$(KMAKE)            menuconfig                       &&\
+	$(KMAKE) -j$(CORES) bzImage modules                  &&\
+	$(KMAKE)            modules_install headers_install
 
 UMAKE = $(XPATH) make -C $(SRC)/$(UCLIBC) O=$(TMP)/uclibc \
          ARCH=$(ARCH) PREFIX=$(ROOT)
