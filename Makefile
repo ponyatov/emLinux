@@ -40,19 +40,26 @@ SYSLINUX_GZ = $(SYSLINUX).tar.xz
 .PHONY: gcclibs0 gmp0 mpfr0 mpc0
 gcclibs0: gmp0 mpfr0 mpc0
 
-CFG_CCLIBS  = configure --prefix=$(HOST) --disable-shared
-CFG_CCLIBS += --with-gmp=$(HOST)
+WITH_GCCLIBS = --with-gmp=$(HOST) --with-mpfr=$(HOST) --with-mpc=$(HOST)
+CFG_GCCLIBS  = configure --prefix=$(HOST) --disable-shared
+CFG_GCCLIBS += $(WITH_GCCLIBS)
 
 gmp0: $(HOST)/lib/libgmp.a
 $(HOST)/lib/libgmp.a: $(SRC)/$(GMP)/README
 	rm -rf $(TMP)/gmp ; mkdir $(TMP)/gmp ; cd $(TMP)/gmp ;\
-	$(SRC)/$(GMP)/$(CFG_CCLIBS) &&\
+	$(SRC)/$(GMP)/$(CFG_GCCLIBS) &&\
 	$(MAKE) -j$(CORES) && $(MAKE) install
 
 mpfr0: $(HOST)/lib/libmpfr.a
 $(HOST)/lib/libmpfr.a: $(SRC)/$(MPFR)/README
 	rm -rf $(TMP)/mpfr ; mkdir $(TMP)/mpfr ; cd $(TMP)/mpfr ;\
-	$(SRC)/$(MPFR)/$(CFG_CCLIBS) &&\
+	$(SRC)/$(MPFR)/$(CFG_GCCLIBS) &&\
+	$(MAKE) -j$(CORES) && $(MAKE) install
+
+mpc0: $(HOST)/lib/libmpc.a
+$(HOST)/lib/libmpc.a: $(SRC)/$(MPC)/README
+	rm -rf $(TMP)/mpc ; mkdir $(TMP)/mpc ; cd $(TMP)/mpc ;\
+	$(SRC)/$(MPC)/$(CFG_GCCLIBS) &&\
 	$(MAKE) -j$(CORES) && $(MAKE) install
 
 # src
