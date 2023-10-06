@@ -38,7 +38,8 @@ SYSLINUX_GZ = $(SYSLINUX).tar.xz
 # src
 .PHONY: src
 src: $(SRC)/$(BINUTILS)/README.md $(SRC)/$(GCC)/README.md \
-	 $(SRC)/$(GMP)/README $(SRC)/$(MPFR)/README.md $(SRC)/$(MPC)/README.md
+	 $(SRC)/$(GMP)/README $(SRC)/$(MPFR)/README.md $(SRC)/$(MPC)/README.md \
+	 $(SRC)/$(SYSLINUX)/README.md
 
 $(SRC)/$(GMP)/README: $(GZ)/$(GMP_GZ)
 	cd $(SRC) ; tar zx < $< && mv GMP-$(GMP_VER) $(GMP) ; touch $@
