@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "ms-vscode.makefile-tools",
+        "ms-vscode.cmake-tools",
+        // C++
+        "ms-vscode.cpptools",
+        "jeff-hykin.better-cpp-syntax",
+    ]
+}
