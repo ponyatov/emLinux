@@ -56,7 +56,8 @@ WITH_GCCLIBS = --with-gmp=$(HOST) --with-mpfr=$(HOST) --with-mpc=$(HOST)
 CFG_GCCLIBS  = configure --prefix=$(HOST) --disable-shared
 CFG_GCCLIBS += $(WITH_GCCLIBS)
 
-CFG_BINUTILS = --disable-nls --target=$(TARGET)
+CFG_BINUTILS = --disable-nls --target=$(TARGET) --with-sysroot=$(ROOT)
+CFG_GCC0     = $(CFG_BINUTILS) --enable-languages="c"
 
 gmp0: $(HOST)/lib/libgmp.a
 $(HOST)/lib/libgmp.a: $(SRC)/$(GMP)/README
