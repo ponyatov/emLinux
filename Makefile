@@ -189,3 +189,16 @@ shadow:
 	git push -v
 	git checkout $@
 	git pull -v
+
+.PHONY: release
+release:
+	git tag $(NOW)-$(REL)
+	git push -v --tags
+	$(MAKE) shadow
+
+.PHONY: zip
+ZIP = tmp/$(MODULE)_$(NOW)_$(REL)_$(BRANCH).zip
+zip:
+	git archive --format zip --output $(ZIP) HEAD
+	zip -ru $(ZIP) tmp/*.?pp static/
+	unzip -t $(ZIP)
