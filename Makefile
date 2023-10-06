@@ -107,6 +107,19 @@ $(HOST)/bin/$(TARGET)-gcc: $(SRC)/$(GCC)/README.md
 	$(MAKE) -j$(CORES) all-gcc && $(MAKE) install-gcc &&\
 	$(MAKE) -j$(CORES) all-target-libgcc && $(MAKE) install-target-libgcc
 
+KMAKE  = $(XPATH) make -C $(SRC)/$(LINUX) O=$(TMP)/linux \
+         ARCH=$(ARCH) CROSS_COMPILE=$(TARGET)- \
+         INSTALL_MOD_PATH=$(ROOT) INSTALL_HDR_PATH=$(ROOT)
+KONFIG = $(TMP)/linux/.config
+
+linux: $(SRC)/$(LINUX)/README.md
+	rm $(KONFIG) ; $(KMAKE) allnoconfig &&\
+	cat all/all.kernel arch/$(ARCH).kernel cpu/$(CPU).kernel \
+	    hw/$(HW).kernel app/$(APP).kernel   >> $(KONFIG) &&\
+	echo CONFIG_DEFAULT_HOSTNAME=\"$(APP)\" >> $(KONFIG) &&\
+	$(KMAKE) menuconfig
+# rm -rf $(TMP)/linux ; mkdir $(TMP)/linux ; cd $(TMP)/linux ;\
+
 # src
 .PHONY: src
 src: $(SRC)/$(BINUTILS)/README.md $(SRC)/$(GCC)/README.md \
