@@ -59,7 +59,10 @@ CFG_GCCLIBS += $(WITH_GCCLIBS)
 CFG_BINUTILS = --disable-nls --target=$(TARGET) --with-sysroot=$(ROOT) \
                --disable-multilib
 CFG_GCC0     = $(CFG_BINUTILS) $(WITH_GCCLIBS) \
-               --without-headers --enable-languages="c"
+               --without-headers --enable-languages="c" \
+               --disable-shared --disable-decimal-float --disable-libgomp \
+               --disable-libmudflap --disable-libssp --disable-libatomic \
+               --disable-libquadmath --disable-threads
 
 gmp0: $(HOST)/lib/libgmp.a
 $(HOST)/lib/libgmp.a: $(SRC)/$(GMP)/README
@@ -90,7 +93,8 @@ gcc0: $(HOST)/bin/$(TARGET)-gcc
 $(HOST)/bin/$(TARGET)-gcc: $(SRC)/$(GCC)/README.md
 	rm -rf $(TMP)/gcc0 ; mkdir $(TMP)/gcc0 ; cd $(TMP)/gcc0 ;\
 	$(XPATH) $(SRC)/$(GCC)/$(CFG_HOST) $(CFG_GCC0) &&\
-	$(MAKE) -j$(CORES) all-gcc && $(MAKE) install-gcc
+	$(MAKE) -j$(CORES) all-target-libgcc && $(MAKE) install-target-libgcc
+# $(MAKE) -j$(CORES) all-gcc && $(MAKE) install-gcc &&\
 # $(MAKE) -j$(CORES) && $(MAKE) install
 
 # src
