@@ -205,5 +205,5 @@ release:
 ZIP = tmp/$(MODULE)_$(NOW)_$(REL)_$(BRANCH).zip
 zip:
 	git archive --format zip --output $(ZIP) HEAD
-	zip -ru $(ZIP) tmp/*.?pp static/
+#	zip -ru $(ZIP) tmp/*.?pp static/
 	unzip -t $(ZIP)
