@@ -1,0 +1,5 @@
+# bus
+CONFIG_ISA=y
+CONFIG_ISAPNP=y
+
+# drivers
