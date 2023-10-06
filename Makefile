@@ -117,7 +117,8 @@ linux: $(SRC)/$(LINUX)/README.md
 	cat all/all.kernel arch/$(ARCH).kernel cpu/$(CPU).kernel \
 	    hw/$(HW).kernel app/$(APP).kernel   >> $(KONFIG) &&\
 	echo CONFIG_DEFAULT_HOSTNAME=\"$(APP)\" >> $(KONFIG) &&\
-	$(KMAKE) menuconfig
+	$(KMAKE) menuconfig && $(KMAKE) -j$(CORES) &&\
+	$(KMAKE) modules_install headers_install
 # rm -rf $(TMP)/linux ; mkdir $(TMP)/linux ; cd $(TMP)/linux ;\
 
 # src
@@ -171,3 +172,20 @@ $(GZ)/$(UCLIBC_GZ):
 	$(CURL) $@ https://downloads.uclibc-ng.org/releases/$(UCLIBC_VER)/$(UCLIBC_GZ)
 $(GZ)/$(BUSYBOX_GZ):
 	$(CURL) $@ https://busybox.net/downloads/$(BUSYBOX_GZ)
+
+# merge
+MERGE += Makefile apt.txt .gitignore .vscode
+MERGE += all arch cpu hw app
+MERGE += host root fw
+MERGE += src tmp
+
+dev:
+	git push -v
+	git checkout $@
+	git pull -v
+	git merge shadow -- $(MERGE)
+
+shadow:
+	git push -v
+	git checkout $@
+	git pull -v
