@@ -1,6 +1,11 @@
 # var
-MODULE = $(notdir $(CURDIR))
-CORES  = $(shell grep proc /proc/cpuinfo| wc -l)
+MODULE  = $(notdir $(CURDIR))
+module  = $(shell echo $(MODULE) | tr A-Z a-z)
+OS      = $(shell uname -o|tr / _)
+NOW     = $(shell date +%d%m%y)
+REL     = $(shell git rev-parse --short=4 HEAD)
+BRANCH  = $(shell git rev-parse --abbrev-ref HEAD)
+CORES  ?= $(shell grep processor /proc/cpuinfo | wc -l)
 
 # target
 APP = fx
