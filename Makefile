@@ -122,21 +122,18 @@ $(HOST)/bin/$(TARGET)-gcc: $(SRC)/$(GCC)/README.md
 	$(MAKE) -j$(CORES) all-gcc && $(MAKE) install-gcc &&\
 	$(MAKE) -j$(CORES) all-target-libgcc && $(MAKE) install-target-libgcc
 
-KMAKE  = $(XPATH) make -C $(SRC)/$(LINUX) O=$(TMP)/linux \
-         ARCH=$(ARCH) CROSS_COMPILE=$(TARGET)- \
+KMAKE  = $(XPATH) make ARCH=$(ARCH) CROSS_COMPILE=$(TARGET)- \
          INSTALL_MOD_PATH=$(ROOT) INSTALL_HDR_PATH=$(ROOT)/usr
-KONFIG = $(TMP)/linux/.config
 
 .PHONY: linux
 linux: $(SRC)/$(LINUX)/README.md
-	mkdir -p $(TMP)/linux ; cd $(TMP)/linux ;\
-	rm $(KONFIG) ; $(KMAKE) allnoconfig &&\
-	cat $(CWD)/all/all.kernel $(CWD)/arch/$(ARCH).kernel \
-		$(CWD)/cpu/$(CPU).kernel $(CWD)/hw/$(HW).kernel \
-		$(CWD)/app/$(APP).kernel            >> $(KONFIG) &&\
-	echo CONFIG_DEFAULT_HOSTNAME=\"$(APP)\" >> $(KONFIG) &&\
-	$(KMAKE)            menuconfig                       &&\
-	$(KMAKE) -j$(CORES) bzImage modules                  &&\
+	cd $(SRC)/$(LINUX) ; rm .config ; $(KMAKE) allnoconfig &&\
+	cat $(CWD)/all/all.kernel $(CWD)/arch/$(ARCH).kernel     \
+		$(CWD)/cpu/$(CPU).kernel $(CWD)/hw/$(HW).kernel      \
+		$(CWD)/app/$(APP).kernel             >> .config    &&\
+	echo CONFIG_DEFAULT_HOSTNAME=\"$(APP)\"  >> .config    &&\
+	$(KMAKE)            menuconfig                         &&\
+	$(KMAKE) -j$(CORES) bzImage modules                    &&\
 	$(KMAKE)            modules_install headers_install
 
 UMAKE = $(XPATH) make -C $(SRC)/$(UCLIBC) O=$(TMP)/uclibc \
