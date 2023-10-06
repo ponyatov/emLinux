@@ -1,0 +1,4 @@
+git make curl
+code
+g++
+bc bzip2 libncurses-dev
