@@ -131,22 +131,26 @@ KONFIG = $(TMP)/linux/.config
 linux: $(SRC)/$(LINUX)/README.md
 	mkdir -p $(TMP)/linux ; cd $(TMP)/linux ;\
 	rm $(KONFIG) ; $(KMAKE) allnoconfig &&\
-	cat all/all.kernel arch/$(ARCH).kernel cpu/$(CPU).kernel \
-	    hw/$(HW).kernel app/$(APP).kernel   >> $(KONFIG) &&\
+	cat $(CWD)/all/all.kernel $(CWD)/arch/$(ARCH).kernel \
+	    $(CWD)/cpu/$(CPU).kernel $(CWD)/hw/$(HW).kernel \
+		$(CWD)/app/$(APP).kernel            >> $(KONFIG) &&\
 	echo CONFIG_DEFAULT_HOSTNAME=\"$(APP)\" >> $(KONFIG) &&\
 	$(KMAKE) menuconfig && $(KMAKE) -j$(CORES) &&\
 	$(KMAKE) modules_install headers_install
 
 UMAKE = $(XPATH) make -C $(SRC)/$(UCLIBC) O=$(TMP)/uclibc \
-         ARCH=$(ARCH) CROSS_COMPILE=$(TARGET)-
+         ARCH=$(ARCH) PREFIX=$(ROOT)/uclibc
 UONFIG = $(TMP)/uclibc/.config
 .PHONY: uclibc
 uclibc: $(SRC)/$(UCLIBC)/README.md
 	mkdir -p $(TMP)/uclibc ; cd $(TMP)/uclibc ;\
 	rm $(UONFIG) ; $(UMAKE) allnoconfig &&\
-	cat all/all.uclibc arch/$(ARCH).uclibc cpu/$(CPU).uclibc \
-	    hw/$(HW).uclibc app/$(APP).uclibc   >> $(UONFIG) &&\
-	$(UMAKE) menuconfig
+	cat $(CWD)/all/all.uclibc $(CWD)/arch/$(ARCH).uclibc \
+        $(CWD)/cpu/$(CPU).uclibc $(CWD)/hw/$(HW).uclibc \
+        $(CWD)/app/$(APP).uclibc              >> $(UONFIG) &&\
+	echo KERNEL_HEADERS=\"$(ROOT)/include\"   >> $(UONFIG) &&\
+	echo CROSS_COMPILER_PREFIX=\"$(TARGET)-\" >> $(UONFIG) &&\
+	$(UMAKE) menuconfig && $(UMAKE) -j$(CORES) && $(UMAKE) install
 
 # src
 .PHONY: src

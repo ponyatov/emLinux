@@ -13,6 +13,7 @@
     // files
     "files.associations": {
         "*.kernel":"makefile",
+        "*.uclibc":"makefile",
     },
 
     // editor
