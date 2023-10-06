@@ -1,5 +1,6 @@
 # var
 MODULE = $(notdir $(CURDIR))
+CORES  = $(shell grep proc /proc/cpuinfo| wc -l)
 
 # dirs
 CWD  = $(CURDIR)
@@ -34,6 +35,25 @@ GMP_GZ      = $(GMP).tar.gz
 MPFR_GZ     = $(MPFR).tar.xz
 MPC_GZ      = $(MPC).tar.gz
 SYSLINUX_GZ = $(SYSLINUX).tar.xz
+
+# build
+.PHONY: gcclibs0 gmp0 mpfr0 mpc0
+gcclibs0: gmp0 mpfr0 mpc0
+
+CFG_CCLIBS  = configure --prefix=$(HOST) --disable-shared
+CFG_CCLIBS += --with-gmp=$(HOST)
+
+gmp0: $(HOST)/lib/libgmp.a
+$(HOST)/lib/libgmp.a: $(SRC)/$(GMP)/README
+	rm -rf $(TMP)/gmp ; mkdir $(TMP)/gmp ; cd $(TMP)/gmp ;\
+	$(SRC)/$(GMP)/$(CFG_CCLIBS) &&\
+	$(MAKE) -j$(CORES) && $(MAKE) install
+
+mpfr0: $(HOST)/lib/libmpfr.a
+$(HOST)/lib/libmpfr.a: $(SRC)/$(MPFR)/README
+	rm -rf $(TMP)/mpfr ; mkdir $(TMP)/mpfr ; cd $(TMP)/mpfr ;\
+	$(SRC)/$(MPFR)/$(CFG_CCLIBS) &&\
+	$(MAKE) -j$(CORES) && $(MAKE) install
 
 # src
 .PHONY: src
