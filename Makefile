@@ -3,10 +3,12 @@ MODULE = $(notdir $(CURDIR))
 CORES  = $(shell grep proc /proc/cpuinfo| wc -l)
 
 # target
-HW = qemu386
-include hw/$(HW).mk
-include cpu/$(CPU).mk
+APP = fx
+HW  = qemu386
+include   hw/$(HW).mk
+include  cpu/$(CPU).mk
 include arch/$(ARCH).mk
+include  app/$(APP).mk
 
 # dirs
 CWD  = $(CURDIR)
@@ -26,6 +28,9 @@ GMP_VER      = 6.2.1
 MPFR_VER     = 4.2.1
 MPC_VER      = 1.3.1
 SYSLINUX_VER = 6.03
+LINUX_VER    = 6.5.5
+UCLIBC_VER   = 1.0.44
+BUSYBOX_VER  = 1.36.1
 
 # package
 BINUTILS = binutils-$(BINUTILS_VER)
@@ -34,6 +39,9 @@ GMP      = gmp-$(GMP_VER)
 MPFR     = mpfr-$(MPFR_VER)
 MPC      = mpc-$(MPC_VER)
 SYSLINUX = syslinux-$(SYSLINUX_VER)
+LINUX    = linux-$(LINUX_VER)
+UCLIBC   = uClibc-ng-$(UCLIBC_VER)
+BUSYBOX  = busybox-$(BUSYBOX_VER)
 
 BINUTILS_GZ = $(BINUTILS).tar.xz
 GCC_GZ      = $(GCC).tar.xz
@@ -41,6 +49,9 @@ GMP_GZ      = $(GMP).tar.gz
 MPFR_GZ     = $(MPFR).tar.xz
 MPC_GZ      = $(MPC).tar.gz
 SYSLINUX_GZ = $(SYSLINUX).tar.xz
+LINUX_GZ    = $(LINUX).tar.xz
+UCLIBC_GZ   = $(UCLIBC).tar.xz
+BUSYBOX_GZ  = $(BUSYBOX).tar.bz2
 
 # cfg
 
@@ -59,7 +70,7 @@ CFG_GCCLIBS += $(WITH_GCCLIBS)
 CFG_BINUTILS = --disable-nls --target=$(TARGET) --with-sysroot=$(ROOT) \
                --disable-multilib
 CFG_GCC0     = $(CFG_BINUTILS) $(WITH_GCCLIBS) \
-               --without-headers --enable-languages="c" \
+               --without-headers --with-newlib --enable-languages="c" \
                --disable-shared --disable-decimal-float --disable-libgomp \
                --disable-libmudflap --disable-libssp --disable-libatomic \
                --disable-libquadmath --disable-threads
@@ -93,15 +104,15 @@ gcc0: $(HOST)/bin/$(TARGET)-gcc
 $(HOST)/bin/$(TARGET)-gcc: $(SRC)/$(GCC)/README.md
 	rm -rf $(TMP)/gcc0 ; mkdir $(TMP)/gcc0 ; cd $(TMP)/gcc0 ;\
 	$(XPATH) $(SRC)/$(GCC)/$(CFG_HOST) $(CFG_GCC0) &&\
+	$(MAKE) -j$(CORES) all-gcc && $(MAKE) install-gcc &&\
 	$(MAKE) -j$(CORES) all-target-libgcc && $(MAKE) install-target-libgcc
-# $(MAKE) -j$(CORES) all-gcc && $(MAKE) install-gcc &&\
-# $(MAKE) -j$(CORES) && $(MAKE) install
 
 # src
 .PHONY: src
 src: $(SRC)/$(BINUTILS)/README.md $(SRC)/$(GCC)/README.md \
 	 $(SRC)/$(GMP)/README $(SRC)/$(MPFR)/README.md $(SRC)/$(MPC)/README.md \
-	 $(SRC)/$(SYSLINUX)/README.md
+	 $(SRC)/$(SYSLINUX)/README.md $(SRC)/$(LINUX)/README.md
+	 du -csh src/*
 
 $(SRC)/$(GMP)/README: $(GZ)/$(GMP_GZ)
 	cd $(SRC) ; tar zx < $< && mv GMP-$(GMP_VER) $(GMP) ; touch $@
@@ -122,8 +133,9 @@ update:
 gz: \
 	$(GZ)/$(BINUTILS_GZ) $(GZ)/$(GCC_GZ) \
 	$(GZ)/$(GMP_GZ) $(GZ)/$(MPFR_GZ) $(GZ)/$(MPC_GZ) \
-	$(GZ)/$(SYSLINUX_GZ)
-	ls -la $^
+	$(GZ)/$(SYSLINUX_GZ) \
+	$(GZ)/$(LINUX_GZ) $(GZ)/$(UCLIBC_GZ) $(GZ)/$(BUSYBOX_GZ)
+	du -csh $^
 
 $(GZ)/$(BINUTILS_GZ):
 	$(CURL) $@ https://ftp.gnu.org/gnu/binutils/$(BINUTILS_GZ)
@@ -139,3 +151,10 @@ $(GZ)/$(MPC_GZ):
 
 $(GZ)/$(SYSLINUX_GZ):
 	$(CURL) $@ https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/$(SYSLINUX_GZ)
+
+$(GZ)/$(LINUX_GZ):
+	$(CURL) $@ https://cdn.kernel.org/pub/linux/kernel/v6.x/$(LINUX_GZ)
+$(GZ)/$(UCLIBC_GZ):
+	$(CURL) $@ https://downloads.uclibc-ng.org/releases/$(UCLIBC_VER)/$(UCLIBC_GZ)
+$(GZ)/$(BUSYBOX_GZ):
+	$(CURL) $@ https://busybox.net/downloads/$(BUSYBOX_GZ)
