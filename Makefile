@@ -75,7 +75,9 @@ $(HOST)/lib/libmpc.a: $(SRC)/$(MPC)/README
 binutils0: $(HOST)/bin/ld
 $(HOST)/bin/ld: $(SRC)/$(BINUTILS)/README.md
 	rm -rf $(TMP)/binutils0 ; mkdir $(TMP)/binutils0 ; cd $(TMP)/binutils0 ;\
-	$(SRC)/$(BINUTILS)/$(CFG_HOST) $(CFG_BINUTILS)
+	$(SRC)/$(BINUTILS)/$(CFG_HOST) $(CFG_BINUTILS) &&\
+	$(MAKE) -j$(CORES) && $(MAKE) install
+
 gcc0:
 
 # src
