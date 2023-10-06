@@ -2,6 +2,12 @@
 MODULE = $(notdir $(CURDIR))
 CORES  = $(shell grep proc /proc/cpuinfo| wc -l)
 
+# target
+HW = qemu386
+include hw/$(HW).mk
+include cpu/$(CPU).mk
+include arch/$(ARCH).mk
+
 # dirs
 CWD  = $(CURDIR)
 SRC  = $(CWD)/src
@@ -44,6 +50,9 @@ WITH_GCCLIBS = --with-gmp=$(HOST) --with-mpfr=$(HOST) --with-mpc=$(HOST)
 CFG_GCCLIBS  = configure --prefix=$(HOST) --disable-shared
 CFG_GCCLIBS += $(WITH_GCCLIBS)
 
+CFG_HOST     = configure --prefix=$(HOST)
+CFG_BINUTILS = --disable-nls --target=$(TARGET)
+
 gmp0: $(HOST)/lib/libgmp.a
 $(HOST)/lib/libgmp.a: $(SRC)/$(GMP)/README
 	rm -rf $(TMP)/gmp ; mkdir $(TMP)/gmp ; cd $(TMP)/gmp ;\
@@ -61,6 +70,13 @@ $(HOST)/lib/libmpc.a: $(SRC)/$(MPC)/README
 	rm -rf $(TMP)/mpc ; mkdir $(TMP)/mpc ; cd $(TMP)/mpc ;\
 	$(SRC)/$(MPC)/$(CFG_GCCLIBS) &&\
 	$(MAKE) -j$(CORES) && $(MAKE) install
+
+.PHONY: binutils0 gcc0
+binutils0: $(HOST)/bin/ld
+$(HOST)/bin/ld: $(SRC)/$(BINUTILS)/README.md
+	rm -rf $(TMP)/binutils0 ; mkdir $(TMP)/binutils0 ; cd $(TMP)/binutils0 ;\
+	$(SRC)/$(BINUTILS)/$(CFG_HOST) $(CFG_BINUTILS)
+gcc0:
 
 # src
 .PHONY: src
