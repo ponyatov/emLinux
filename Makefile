@@ -124,7 +124,7 @@ $(HOST)/bin/$(TARGET)-gcc: $(SRC)/$(GCC)/README.md
 
 KMAKE  = $(XPATH) make -C $(SRC)/$(LINUX) O=$(TMP)/linux \
          ARCH=$(ARCH) CROSS_COMPILE=$(TARGET)- \
-         INSTALL_MOD_PATH=$(ROOT) INSTALL_HDR_PATH=$(ROOT)
+         INSTALL_MOD_PATH=$(ROOT) INSTALL_HDR_PATH=$(ROOT)/usr
 KONFIG = $(TMP)/linux/.config
 
 .PHONY: linux
@@ -135,11 +135,12 @@ linux: $(SRC)/$(LINUX)/README.md
 	    $(CWD)/cpu/$(CPU).kernel $(CWD)/hw/$(HW).kernel \
 		$(CWD)/app/$(APP).kernel            >> $(KONFIG) &&\
 	echo CONFIG_DEFAULT_HOSTNAME=\"$(APP)\" >> $(KONFIG) &&\
-	$(KMAKE) menuconfig && $(KMAKE) -j$(CORES) &&\
-	$(KMAKE) modules_install headers_install
+	$(KMAKE) menuconfig &&\
+	$(KMAKE) -j$(CORES) && $(KMAKE) -j$(CORES) modules &&\
+	$(KMAKE) modules_install headers_install && $(MAKE) fw
 
 UMAKE = $(XPATH) make -C $(SRC)/$(UCLIBC) O=$(TMP)/uclibc \
-         ARCH=$(ARCH) PREFIX=$(ROOT)/uclibc
+         ARCH=$(ARCH) PREFIX=$(ROOT)
 UONFIG = $(TMP)/uclibc/.config
 .PHONY: uclibc
 uclibc: $(SRC)/$(UCLIBC)/README.md
@@ -147,9 +148,11 @@ uclibc: $(SRC)/$(UCLIBC)/README.md
 	rm $(UONFIG) ; $(UMAKE) allnoconfig &&\
 	cat $(CWD)/all/all.uclibc $(CWD)/arch/$(ARCH).uclibc \
         $(CWD)/cpu/$(CPU).uclibc $(CWD)/hw/$(HW).uclibc \
-        $(CWD)/app/$(APP).uclibc              >> $(UONFIG) &&\
-	echo KERNEL_HEADERS=\"$(ROOT)/include\"   >> $(UONFIG) &&\
-	echo CROSS_COMPILER_PREFIX=\"$(TARGET)-\" >> $(UONFIG) &&\
+        $(CWD)/app/$(APP).uclibc                >> $(UONFIG) &&\
+	echo KERNEL_HEADERS=\"$(ROOT)/usr/include\" >> $(UONFIG) &&\
+	echo CROSS_COMPILER_PREFIX=\"$(TARGET)-\"   >> $(UONFIG) &&\
+	echo RUNTIME_PREFIX=\"\" >> $(UONFIG) &&\
+	echo DEVEL_PREFIX=\"/usr\" >> $(UONFIG) &&\
 	$(UMAKE) menuconfig && $(UMAKE) -j$(CORES) && $(UMAKE) install
 
 # src
