@@ -42,6 +42,12 @@ MPFR_GZ     = $(MPFR).tar.xz
 MPC_GZ      = $(MPC).tar.gz
 SYSLINUX_GZ = $(SYSLINUX).tar.xz
 
+# cfg
+
+XPATH    = PATH=$(HOST)/bin:$(PATH)
+
+CFG_HOST = configure --prefix=$(HOST)
+
 # build
 .PHONY: gcclibs0 gmp0 mpfr0 mpc0
 gcclibs0: gmp0 mpfr0 mpc0
@@ -50,7 +56,6 @@ WITH_GCCLIBS = --with-gmp=$(HOST) --with-mpfr=$(HOST) --with-mpc=$(HOST)
 CFG_GCCLIBS  = configure --prefix=$(HOST) --disable-shared
 CFG_GCCLIBS += $(WITH_GCCLIBS)
 
-CFG_HOST     = configure --prefix=$(HOST)
 CFG_BINUTILS = --disable-nls --target=$(TARGET)
 
 gmp0: $(HOST)/lib/libgmp.a
@@ -72,10 +77,10 @@ $(HOST)/lib/libmpc.a: $(SRC)/$(MPC)/README
 	$(MAKE) -j$(CORES) && $(MAKE) install
 
 .PHONY: binutils0 gcc0
-binutils0: $(HOST)/bin/ld
-$(HOST)/bin/ld: $(SRC)/$(BINUTILS)/README.md
+binutils0: $(HOST)/bin/$(TARGET)-ld
+$(HOST)/bin/$(TARGET)-ld: $(SRC)/$(BINUTILS)/README.md
 	rm -rf $(TMP)/binutils0 ; mkdir $(TMP)/binutils0 ; cd $(TMP)/binutils0 ;\
-	$(SRC)/$(BINUTILS)/$(CFG_HOST) $(CFG_BINUTILS) &&\
+	$(XPATH) $(SRC)/$(BINUTILS)/$(CFG_HOST) $(CFG_BINUTILS) &&\
 	$(MAKE) -j$(CORES) && $(MAKE) install
 
 gcc0:
