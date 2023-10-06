@@ -64,6 +64,16 @@ XPATH    = PATH=$(HOST)/bin:$(PATH)
 
 CFG_HOST = configure --prefix=$(HOST)
 
+.PHONY: fw
+fw: fw/bzImage
+
+.PHONY: qemu
+qemu: fw/bzImage
+	$(QEMU) $(QEMU_CFG) -kernel $<
+
+fw/bzImage: tmp/linux/arch/x86/boot/bzImage
+	cp $< $@
+
 # build
 .PHONY: gcclibs0 gmp0 mpfr0 mpc0
 gcclibs0: gmp0 mpfr0 mpc0
@@ -117,14 +127,26 @@ KMAKE  = $(XPATH) make -C $(SRC)/$(LINUX) O=$(TMP)/linux \
          INSTALL_MOD_PATH=$(ROOT) INSTALL_HDR_PATH=$(ROOT)
 KONFIG = $(TMP)/linux/.config
 
+.PHONY: linux
 linux: $(SRC)/$(LINUX)/README.md
+	mkdir -p $(TMP)/linux ; cd $(TMP)/linux ;\
 	rm $(KONFIG) ; $(KMAKE) allnoconfig &&\
 	cat all/all.kernel arch/$(ARCH).kernel cpu/$(CPU).kernel \
 	    hw/$(HW).kernel app/$(APP).kernel   >> $(KONFIG) &&\
 	echo CONFIG_DEFAULT_HOSTNAME=\"$(APP)\" >> $(KONFIG) &&\
 	$(KMAKE) menuconfig && $(KMAKE) -j$(CORES) &&\
 	$(KMAKE) modules_install headers_install
-# rm -rf $(TMP)/linux ; mkdir $(TMP)/linux ; cd $(TMP)/linux ;\
+
+UMAKE = $(XPATH) make -C $(SRC)/$(UCLIBC) O=$(TMP)/uclibc \
+         ARCH=$(ARCH) CROSS_COMPILE=$(TARGET)-
+UONFIG = $(TMP)/uclibc/.config
+.PHONY: uclibc
+uclibc: $(SRC)/$(UCLIBC)/README.md
+	mkdir -p $(TMP)/uclibc ; cd $(TMP)/uclibc ;\
+	rm $(UONFIG) ; $(UMAKE) allnoconfig &&\
+	cat all/all.uclibc arch/$(ARCH).uclibc cpu/$(CPU).uclibc \
+	    hw/$(HW).uclibc app/$(APP).uclibc   >> $(UONFIG) &&\
+	$(UMAKE) menuconfig
 
 # src
 .PHONY: src
