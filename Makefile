@@ -57,7 +57,8 @@ CFG_GCCLIBS  = configure --prefix=$(HOST) --disable-shared
 CFG_GCCLIBS += $(WITH_GCCLIBS)
 
 CFG_BINUTILS = --disable-nls --target=$(TARGET) --with-sysroot=$(ROOT)
-CFG_GCC0     = $(CFG_BINUTILS) --enable-languages="c"
+CFG_GCC0     = $(CFG_BINUTILS) $(WITH_GCCLIBS) \
+               --without-headers --enable-languages="c"
 
 gmp0: $(HOST)/lib/libgmp.a
 $(HOST)/lib/libgmp.a: $(SRC)/$(GMP)/README
@@ -84,7 +85,12 @@ $(HOST)/bin/$(TARGET)-ld: $(SRC)/$(BINUTILS)/README.md
 	$(XPATH) $(SRC)/$(BINUTILS)/$(CFG_HOST) $(CFG_BINUTILS) &&\
 	$(MAKE) -j$(CORES) && $(MAKE) install
 
-gcc0:
+gcc0: $(HOST)/bin/$(TARGET)-gcc
+$(HOST)/bin/$(TARGET)-gcc: $(SRC)/$(GCC)/README.md
+	rm -rf $(TMP)/gcc0 ; mkdir $(TMP)/gcc0 ; cd $(TMP)/gcc0 ;\
+	$(XPATH) $(SRC)/$(GCC)/$(CFG_HOST) $(CFG_GCC0) &&\
+	$(MAKE) -j$(CORES) all-gcc && $(MAKE) install-gcc
+# $(MAKE) -j$(CORES) && $(MAKE) install
 
 # src
 .PHONY: src
