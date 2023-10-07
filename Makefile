@@ -97,13 +97,13 @@ $(HOST)/lib/libgmp.a: $(SRC)/$(GMP)/README
 	$(MAKE) -j$(CORES) && $(MAKE) install
 
 mpfr0: $(HOST)/lib/libmpfr.a
-$(HOST)/lib/libmpfr.a: $(SRC)/$(MPFR)/README
+$(HOST)/lib/libmpfr.a: $(HOST)/lib/libgmp.a $(SRC)/$(MPFR)/README.md
 	rm -rf $(TMP)/mpfr ; mkdir $(TMP)/mpfr ; cd $(TMP)/mpfr ;\
 	$(SRC)/$(MPFR)/$(CFG_GCCLIBS) &&\
 	$(MAKE) -j$(CORES) && $(MAKE) install
 
 mpc0: $(HOST)/lib/libmpc.a
-$(HOST)/lib/libmpc.a: $(SRC)/$(MPC)/README
+$(HOST)/lib/libmpc.a: $(HOST)/lib/libgmp.a $(SRC)/$(MPC)/README.md
 	rm -rf $(TMP)/mpc ; mkdir $(TMP)/mpc ; cd $(TMP)/mpc ;\
 	$(SRC)/$(MPC)/$(CFG_GCCLIBS) &&\
 	$(MAKE) -j$(CORES) && $(MAKE) install
@@ -116,7 +116,9 @@ $(HOST)/bin/$(TARGET)-ld: $(SRC)/$(BINUTILS)/README.md
 	$(MAKE) -j$(CORES) && $(MAKE) install
 
 gcc0: $(HOST)/bin/$(TARGET)-gcc
-$(HOST)/bin/$(TARGET)-gcc: $(SRC)/$(GCC)/README.md
+$(HOST)/bin/$(TARGET)-gcc: $(HOST)/bin/$(TARGET)-ld \
+							$(HOST)/lib/libmpfr.a $(HOST)/lib/libmpc.a \
+							$(SRC)/$(GCC)/README.md
 	rm -rf $(TMP)/gcc0 ; mkdir $(TMP)/gcc0 ; cd $(TMP)/gcc0 ;\
 	$(XPATH) $(SRC)/$(GCC)/$(CFG_HOST) $(CFG_GCC0) &&\
 	$(MAKE) -j$(CORES) all-gcc && $(MAKE) install-gcc &&\
@@ -161,14 +163,13 @@ src: $(SRC)/$(BINUTILS)/README.md $(SRC)/$(GCC)/README.md \
 	 $(SRC)/$(SYSLINUX)/README.md $(SRC)/$(LINUX)/README.md
 	 du -csh src/*
 
-$(SRC)/$(GMP)/README: $(GZ)/$(GMP_GZ)
-	cd $(SRC) ; tar zx < $< && mv GMP-$(GMP_VER) $(GMP) ; touch $@
-
 # rule
 $(SRC)/%/README.md: $(GZ)/%.tar.xz
 	cd $(SRC) ; xzcat $< | tar x && touch $@
 $(SRC)/%/README.md: $(GZ)/%.tar.gz
 	cd $(SRC) ;  zcat $< | tar x && touch $@
+$(SRC)/$(GMP)/README: $(GZ)/$(GMP_GZ)
+	cd $(SRC) ; tar zx < $< && mv GMP-$(GMP_VER) $(GMP) ; touch $@
 
 # install
 .PHONY: install update gz
