@@ -15,6 +15,12 @@
         "*.kernel":"makefile",
         "*.uclibc":"makefile",
     },
+    "files.exclude": {
+        // "src/*-*/**": true,
+    },
+        "files.watcherExclude": {
+        "src/*-*/**": true,
+    },
 
     // editor
     "editor.tabSize": 4,
